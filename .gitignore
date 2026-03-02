@@ -1,0 +1,4 @@
+.env
+silas_env/
+__pycache__/
+*.pyc
