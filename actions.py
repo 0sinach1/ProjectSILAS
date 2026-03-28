@@ -11,7 +11,7 @@ pyautogui.PAUSE = 0.5
 def open_app(app_name):
     """Open an application by name"""
     apps = {
-        "chrome": "chrome",
+        "chrome": r"C:\Program Files\Google\Chrome\Application\chrome.exe",
         "firefox": "firefox",
         "notepad": "notepad",
         "vscode": "code",

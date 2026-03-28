@@ -35,7 +35,7 @@ def run_silas():
                 continue
 
             # Shutdown command
-            if any(word in user_input.lower() for word in ["shutdown silas", "goodbye silas", "exit silas"]):
+            if any(word in user_input.lower() for word in ["shutdown", "goodbye", "quit", "exit", "sleep", "shot down", "close down"]):
                 speak("Going offline. Stay sharp, Boss.")
                 break
 
