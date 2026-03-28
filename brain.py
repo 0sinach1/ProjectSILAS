@@ -7,8 +7,10 @@ from config import ANTHROPIC_API_KEY, ONLINE_MODEL, SYSTEM_PROMPT
 def is_online():
     """Check if internet connection is available"""
     try:
-        socket.setdefaulttimeout(3)
-        socket.connect(("8.8.8.8", 53))
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(3)
+        s.connect(("8.8.8.8", 53))
+        s.close()
         return True
     except:
         return False
@@ -59,7 +61,8 @@ def ask_ollama(conversation_history):
                 "prompt": prompt,
                 "stream": False
             },
-            timeout=30
+            timeout=120
+            
         )
         return response.json()["response"].strip()
     
@@ -70,16 +73,15 @@ def ask_ollama(conversation_history):
 # ── Main Brain Function ───────────────────────────
 def think(conversation_history):
     """Route to the right brain depending on connection"""
-    if is_online():
+    if False:
         print("[Online — using Claude]")
         response = ask_claude(conversation_history)
     else:
-        print("[Offline — using Ollama]")
+        print("[Offline — using Ollama/Mistral]")
         response = ask_ollama(conversation_history)
     
     # Parse the JSON response
     try:
-        # Clean response in case there's any extra text around the JSON
         start = response.find("{")
         end = response.rfind("}") + 1
         clean = response[start:end]
@@ -87,9 +89,9 @@ def think(conversation_history):
         return data
     
     except json.JSONDecodeError:
-        print(f"Parse error on response: {response}")
+        # If Ollama doesn't return clean JSON, wrap it
         return {
             "action": "answer_question",
             "params": {},
-            "speak": "I had trouble processing that. Could you say it again?"
+            "speak": response.strip()
         }

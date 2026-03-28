@@ -8,13 +8,12 @@ from actions import execute
 conversation_history = []
 
 def add_to_history(role, content):
-    """Add a message to conversation history"""
+    """Add message to conversation history"""
     conversation_history.append({
         "role": role,
         "content": content
     })
-    
-    # Keep history to last 20 messages so we don't overflow
+    # Keep last 20 messages only
     if len(conversation_history) > 20:
         conversation_history.pop(0)
 
@@ -28,45 +27,47 @@ def run_silas():
             # Step 1 — Listen
             user_input = listen()
             
-            # If nothing was heard, loop back
             if not user_input:
                 continue
             
-            # Check for shutdown command
-            if any(word in user_input.lower() for word in ["shutdown", "goodbye", "exit", "sleep"]):
+            # Ignore background noise transcriptions
+            if len(user_input) < 5 or user_input.strip(".").strip() == "":
+                continue
+
+            # Shutdown command
+            if any(word in user_input.lower() for word in ["shutdown silas", "goodbye silas", "exit silas"]):
                 speak("Going offline. Stay sharp, Boss.")
                 break
-            
+
             # Step 2 — Add to history
             add_to_history("user", user_input)
-            
+
             # Step 3 — Think
             print("Thinking...")
             response = think(conversation_history)
-            
-            # Step 4 — Extract parts of response
+
+            # Step 4 — Extract response parts
             action = response.get("action", "answer_question")
             params = response.get("params", {})
             spoken = response.get("speak", "I didn't catch that.")
-            
-            # Step 5 — Execute laptop action if needed
+
+            # Step 5 — Execute action if needed
             if action != "answer_question":
                 print(f"Executing: {action} with {params}")
                 execute(action, params)
-            
-            # Step 6 — Speak the response
+
+            # Step 6 — Speak
             speak(spoken)
-            
-            # Step 7 — Add SILAS response to history
+
+            # Step 7 — Save to history
             add_to_history("assistant", spoken)
-            
+
         except KeyboardInterrupt:
             speak("Going offline. Stay sharp, Boss.")
             break
-            
+
         except Exception as e:
             print(f"Error in main loop: {e}")
-            speak("Something went wrong. I'm still here though.")
             continue
 
 # ── Entry Point ───────────────────────────────────

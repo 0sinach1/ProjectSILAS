@@ -20,7 +20,7 @@ WHISPER_MODEL = "base"
 
 # ── SILAS Identity ────────────────────────────────
 SILAS_NAME = "SILAS"
-CREATOR_NAME = "Boss"
+CREATOR_NAME = "Elvis"
 
 SYSTEM_PROMPT = f"""
 You are SILAS — a highly intelligent personal AI agent and the digital
